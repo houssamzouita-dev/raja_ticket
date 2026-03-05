@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Billet Officiel RCA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Outfit', sans-serif; background: #fdfdfd; display: flex; flex-direction: column; align-items: center; min-h-screen; padding-top: 20px; }
+    .ticket-container { width: 100%; max-width: 380px; background: white; border-radius: 12px; position: relative; }
+    .logo-img { width: 70px; height: 70px; object-fit: contain; }
+    /* إزالة الخلفية السوداء للوغو الرجاء */
+    .logo-raja { mix-blend-mode: multiply; } 
+    .progress-track { background: #eee; border-radius: 10px; height: 5px; width: 100%; overflow: hidden; }
+    .progress-fill { height: 100%; background: #2d8a5d; transition: width 1s linear; width: 100%; }
+    .info-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; background: #f2f7f5; padding: 12px 8px; border-radius: 10px; }
+    .info-cell { text-align: center; }
+    .transfer-btn { background: #1a734d; color: white; width: 100%; padding: 14px; border-radius: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    /* إزالة الإطار المحيط بالكود */
+    .qr-box { background: transparent; padding: 0; border: none; 
+    
+    /* كيزيد هاد السطر فـ style */
+touch-action: manipulation;} 
+    
+  </style>
+</head>
+<body>
+
+  <div class="ticket-container p-5">
+    <div class="flex justify-end mb-2">
+       <span class="text-gray-400 text-2xl cursor-pointer">✕</span>
+    </div>
+
+    <h1 class="text-xl font-bold text-gray-800 mb-6">Détails du billet</h1>
+
+    <div class="text-center mb-6">
+      <p class="text-[12px] text-gray-400 font-medium">samedi 7 mars. 2026 Complexe Sportif Mohammed V</p>
+    </div>
+
+    <div class="flex items-center justify-between mb-10 px-2">
+      <div class="text-center">
+        <img src="raja_logo.png" class="logo-img logo-raja" alt="RAJA">
+        <p class="text-sm font-bold text-gray-800 mt-2 uppercase tracking-wide">RAJA</p>
+      </div>
+      
+      <div class="text-center">
+        <p class="text-[11px] text-gray-400 font-bold mb-1 uppercase tracking-tighter">Aujourd'hui</p>
+        <p class="text-4xl font-black text-gray-900 tracking-tight">22:00</p>
+      </div>
+
+      <div class="text-center">
+        <img src="ocs_logo.png" class="logo-img" alt="OCS">
+        <p class="text-sm font-bold text-gray-800 mt-2 uppercase tracking-wide">OCS</p>
+      </div>
+    </div>
+
+    <div class="flex justify-center mb-10">
+      <div class="qr-box">
+        <img id="qrImage" src="qr1.png" style="width: 220px; height: 220px;" alt="QR Code">
+      </div>
+    </div>
+
+    <div class="mb-8">
+      <div class="progress-track mb-3">
+        <div id="progressBar" class="progress-fill"></div>
+      </div>
+      <p class="text-center text-[12px] text-gray-500">
+        Ce QR code se met à jour toutes les <span id="timerDisplay" class="font-bold text-[#2d8a5d]">05:00</span>
+      </p>
+    </div>
+
+    <div class="info-grid mb-8">
+      <div class="info-cell"><p class="text-[9px] text-gray-400 uppercase font-bold">Catégorie</p><p class="text-[10px] font-black text-gray-800">BRONZE<br>+ SUD</p></div>
+      <div class="info-cell"><p class="text-[9px] text-gray-400 uppercase font-bold">Porte</p><p class="text-[14px] font-black text-gray-800">23</p></div>
+      <div class="info-cell"><p class="text-[9px] text-gray-400 uppercase font-bold">Zone</p><p class="text-[11px] font-black text-gray-800">Zone 7</p></div>
+      <div class="info-cell"><p class="text-[9px] text-gray-400 uppercase font-bold">Rang</p><p class="text-[14px] font-black text-gray-800">C</p></div>
+      <div class="info-cell"><p class="text-[9px] text-gray-400 uppercase font-bold">Siège</p><p class="text-[14px] font-black text-gray-800">25</p></div>
+    </div>
+
+    <button class="transfer-btn mb-8">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Transférer ce billet
+    </button>
+
+    <div class="text-center">
+      <p class="text-[#1a734d] font-bold text-[15px] mb-1">QR Code unique et personnel.</p>
+      <p class="text-gray-400 text-[11px]">Valable pour une seule entrée.</p>
+    </div>
+  </div>
+
+  <script>
+    let timeLeft = 300;
+    let currentQR = 1;
+    const timerDisplay = document.getElementById('timerDisplay');
+    const progressBar = document.getElementById('progressBar');
+    const qrImage = document.getElementById('qrImage');
+
+    function update() {
+      const min = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+      const sec = (timeLeft % 60).toString().padStart(2, '0');
+      timerDisplay.textContent = `${min}:${sec}`;
+      progressBar.style.width = (timeLeft / 300 * 100) + '%';
+
+      if (timeLeft <= 0) {
+        timeLeft = 300;
+        currentQR = currentQR === 1 ? 2 : 1;
+        qrImage.src = `qr${currentQR}.png`;
+      } else {
+        timeLeft--;
+      }
+    }
+    setInterval(update, 1000);
+    update();
+  </script>
+</body>
+</html>
